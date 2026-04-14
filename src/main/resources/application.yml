@@ -1,0 +1,39 @@
+spring:
+  config:
+    import: "optional:application-secrets.yml"
+
+  application:
+    name: simplified-rag
+
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: oracle.jdbc.OracleDriver
+    type: oracle.ucp.jdbc.PoolDataSource
+    oracleucp:
+      initial-pool-size: 1
+      min-pool-size: 1
+      max-pool-size: 5
+
+  sql:
+    init:
+      mode: always
+
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  ai:
+    google:
+      genai:
+        api-key: ${GOOGLE_GENAI_API_KEY}
+        chat:
+          options:
+            model: ${GOOGLE_GENAI_MODEL}
+            temperature: 0.2
+  jpa:
+    hibernate:
+      ddl-auto: none

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Simplified RAG — Documents</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+</head>
+<body>
+<header th:replace="~{fragments/navbar :: navbar}"></header>
+
+<main class="container">
+
+    <hgroup>
+        <h1>Documents</h1>
+        <p>Upload a PDF, DOCX, or TXT file to start asking questions.</p>
+    </hgroup>
+
+    <article th:if="${success}">
+        <p style="color: var(--pico-color-green-500);">
+            ✅ <span th:text="${success}"></span>
+        </p>
+    </article>
+
+    <article th:if="${error}">
+        <p style="color: var(--pico-color-red-500);">
+            ❌ <span th:text="${error}"></span>
+        </p>
+    </article>
+
+    <article>
+        <h2>Upload a document</h2>
+        <form method="post" action="/documents/upload"
+              enctype="multipart/form-data">
+            <div style="display:flex; gap: 1rem; align-items: center;">
+                <input type="file" name="file"
+                       accept=".pdf,.docx,.txt"
+                       style="flex:1; margin-bottom:0;"/>
+                <button type="submit" style="width:auto; margin-bottom:0;">
+                    Upload
+                </button>
+            </div>
+        </form>
+    </article>
+
+    <article th:if="${not #lists.isEmpty(documents)}">
+        <h2>Uploaded documents</h2>
+        <figure>
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Uploaded</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="doc, stat : ${documents}">
+                    <td th:text="${stat.index + 1}"></td>
+                    <td th:text="${doc.fileName}"></td>
+                    <td><kbd th:text="${doc.fileType}"></kbd></td>
+                    <td th:text="${#temporals.format(doc.uploadedAt, 'dd MMM yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/chat/{id}(id=${doc.id})}"
+                           role="button"
+                           class="outline"
+                           style="white-space: nowrap;">
+                            💬 Ask questions
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </figure>
+    </article>
+
+    <article th:if="${#lists.isEmpty(documents)}">
+        <p style="color: var(--pico-muted-color); text-align: center; padding: 2rem 0;">
+            No documents uploaded yet. Upload one above to get started.
+        </p>
+    </article>
+
+</main>
+
+<footer class="container">
+    <small>Simplified RAG — Oracle AI Vector Search + Gemini</small>
+</footer>
+</body>
+</html>

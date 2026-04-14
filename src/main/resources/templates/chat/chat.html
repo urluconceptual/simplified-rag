@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Simplified RAG — Ask</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+</head>
+<body>
+<header th:replace="~{fragments/navbar :: navbar}"></header>
+
+<main class="container">
+
+    <hgroup>
+        <h1>Ask a Question</h1>
+        <p>Answers are grounded strictly in the uploaded document.</p>
+    </hgroup>
+
+    <article th:if="${error}">
+        <p style="color: var(--pico-color-red-500);">
+            ❌ <span th:text="${error}"></span>
+        </p>
+    </article>
+
+    <article>
+        <form method="post" th:action="@{/chat/{id}(id=${documentId})}">
+            <div style="display:flex; gap: 1rem; align-items: center;">
+                <input type="text"
+                       name="question"
+                       th:value="${question}"
+                       placeholder="Ask something about this document..."
+                       style="flex:1; margin-bottom:0;"/>
+                <button type="submit" style="width:auto; margin-bottom:0;">
+                    Ask
+                </button>
+            </div>
+        </form>
+    </article>
+
+    <div th:if="${answer}">
+
+        <article>
+            <header><strong>💡 Answer</strong></header>
+            <p th:text="${answer}"></p>
+        </article>
+
+        <article>
+            <header><strong>📚 Source chunks</strong></header>
+            <div th:each="chunk, stat : ${sources}">
+                <blockquote>
+                    <small>
+                        <strong th:text="'Chunk ' + (${stat.index} + 1)"></strong>
+                    </small>
+                    <br/>
+                    <span th:text="${chunk}"></span>
+                </blockquote>
+            </div>
+        </article>
+
+    </div>
+
+    <p style="margin-top: 1rem;">
+        <a th:href="@{/documents}">← Back to documents</a>
+    </p>
+
+</main>
+
+<footer class="container">
+    <small>Simplified RAG — Oracle AI Vector Search + Gemini</small>
+</footer>
+</body>
+</html>
