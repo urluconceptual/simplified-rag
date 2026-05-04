@@ -34,14 +34,24 @@
         <form method="post" action="/documents/upload"
               enctype="multipart/form-data">
             <div style="display:flex; gap: 1rem; align-items: center;">
-                <input type="file" name="file"
+                <input id="documentFileInput" type="file" name="file"
                        accept=".pdf,.docx,.txt"
                        style="flex:1; margin-bottom:0;"/>
-                <button type="submit" style="width:auto; margin-bottom:0;">
+                <button id="uploadButton" type="submit" style="width:auto; margin-bottom:0;" disabled>
                     Upload
                 </button>
             </div>
         </form>
+    </article>
+    <article>
+        <div style="text-align: center">
+        <a th:href="@{/chat/documents}"
+           role="button"
+           class="outline"
+           style="white-space: nowrap;">
+            💬 Ask questions
+        </a>
+        </div>
     </article>
 
     <article th:if="${not #lists.isEmpty(documents)}">
@@ -54,7 +64,7 @@
                     <th>Filename</th>
                     <th>Type</th>
                     <th>Uploaded</th>
-                    <th></th>
+<!--                    <th></th>-->
                 </tr>
                 </thead>
                 <tbody>
@@ -63,14 +73,14 @@
                     <td th:text="${doc.fileName}"></td>
                     <td><kbd th:text="${doc.fileType}"></kbd></td>
                     <td th:text="${#temporals.format(doc.uploadedAt, 'dd MMM yyyy HH:mm')}"></td>
-                    <td>
-                        <a th:href="@{/chat/{id}(id=${doc.id})}"
-                           role="button"
-                           class="outline"
-                           style="white-space: nowrap;">
-                            💬 Ask questions
-                        </a>
-                    </td>
+<!--                    <td>-->
+<!--                        <a th:href="@{/chat/{id}(id=${doc.id})}"-->
+<!--                           role="button"-->
+<!--                           class="outline"-->
+<!--                           style="white-space: nowrap;">-->
+<!--                            💬 Ask questions-->
+<!--                        </a>-->
+<!--                    </td>-->
                 </tr>
                 </tbody>
             </table>
@@ -88,5 +98,23 @@
 <footer class="container">
     <small>Simplified RAG — Oracle AI Vector Search + Gemini</small>
 </footer>
+
+<script>
+    (function () {
+        const fileInput = document.getElementById('documentFileInput');
+        const uploadButton = document.getElementById('uploadButton');
+
+        if (!fileInput || !uploadButton) {
+            return;
+        }
+
+        const updateUploadState = () => {
+            uploadButton.disabled = !(fileInput.files && fileInput.files.length > 0);
+        };
+
+        fileInput.addEventListener('change', updateUploadState);
+        updateUploadState();
+    })();
+</script>
 </body>
 </html>

@@ -27,6 +27,11 @@ public class DocumentService {
         return documentRepository.findAllOrderByUploadedAtDesc();
     }
 
+    public Document findById(Long id) {
+        return documentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found with id: " + id));
+    }
+
     public void storeFile(MultipartFile file) throws Exception {
         validateFile(file);
         String text = extractText(file);
