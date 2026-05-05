@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Simplified RAG — Ask</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"/>
+</head>
+<body>
+<header th:replace="~{fragments/navbar :: navbar}"></header>
+
+<main class="container">
+
+    <article th:if="${error}">
+        <p style="color: var(--pico-color-red-500);">
+            ❌ <span th:text="${error}"></span>
+        </p>
+    </article>
+
+    <article th:if="${not #lists.isEmpty(itemForm.items) && responseGenerated == false}">
+        <h2>Available documents</h2>
+        <figure>
+            <form th:action="@{/chat/documents}" th:object="${itemForm}" method="post">
+                <div th:each="item, iterStat : *{items}" style="margin: 0.5rem 0;">
+                    <input type="checkbox"
+                           th:field="*{items[__${iterStat.index}__].selected}" />
+                    <input type="hidden"
+                           th:field="*{items[__${iterStat.index}__].id}" />
+                    <span th:text="*{items[__${iterStat.index}__].name}"></span>
+                </div>
+                <input type="text"
+                       name="question"
+                       th:value="${question}"
+                       placeholder="Ask something about the selected documents..."
+                       style="flex:1; margin-bottom:0; margin-top: 0.5rem"
+                       required
+                       id="questionInput"/>
+                <div style="text-align: end; margin-top: 1rem;">
+                    <button type="submit" style="width: auto; padding: 0.5rem 1rem;" id="askButton" disabled>Ask</button>
+                </div>
+            </form>
+        </figure>
+    </article>
+
+    <article th:if="${not #lists.isEmpty(itemForm.items) && responseGenerated == true}">
+        <h2>Selected documents</h2>
+        <figure>
+            <div th:each="item, iterStat : *{selectedForm.items}">
+                <em><span th:text="${item.name}" style="margin: 0.5rem"></span></em>
+            </div>
+            <span style="margin: 0.5rem"><strong>Question: </strong></span>
+            <span th:text="${question}" style="flex:1; margin-bottom:0;"/>
+            <div style="text-align: end; margin-top: 1rem;">
+                <a th:href="@{/chat/documents}" style="text-decoration: none;">
+                    <button>Back to ask a question</button>
+                </a>
+            </div>
+        </figure>
+    </article>
+
+    <article th:if="${#lists.isEmpty(itemForm.items)}">
+        <p style="color: var(--pico-muted-color); text-align: center; padding: 2rem 0;">
+            No documents available
+        </p>
+    </article>
+
+    <div th:if="${answer}">
+        <article>
+            <header><strong>💡 Answer</strong></header>
+            <p th:text="${answer}"></p>
+        </article>
+
+        <article>
+            <header><strong>📚 Source chunks</strong></header>
+            <div th:each="chunk, stat : ${sources}">
+                <blockquote>
+                    <small>
+                        <strong th:text="'Chunk ' + (${stat.index} + 1)"></strong>
+                        <span th:text=" '(retrieved from '  + ${sourcesMap.get(chunk.id)} +')'"></span>
+                    </small>
+                    <br/>
+                    <span th:text="${chunk.chunkText}"></span>
+                </blockquote>
+            </div>
+        </article>
+    </div>
+
+    <p style="margin-top: 1rem;">
+        <a th:href="@{/documents}">← Back to documents</a>
+    </p>
+</main>
+
+<footer class="container">
+    <small>Simplified RAG — Oracle AI Vector Search + Gemini</small>
+</footer>
+</body>
+<script>
+    const questionInput = document.getElementById('questionInput');
+    const askButton = document.getElementById('askButton');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    function updateButtonState() {
+        const hasQuestion = questionInput.value.trim() !== '';
+        const hasSelectedDocs = Array.from(checkboxes).some(cb => cb.checked);
+        askButton.disabled = !hasQuestion || !hasSelectedDocs;
+    }
+
+    questionInput.addEventListener('input', updateButtonState);
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateButtonState);
+    });
+
+    updateButtonState();
+</script>
+
+</html>
