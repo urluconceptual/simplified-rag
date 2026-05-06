@@ -32,6 +32,11 @@ public class DocumentService {
                 .orElseThrow(() -> new IllegalArgumentException("Document not found with id: " + id));
     }
 
+    public void delete(Long id) {
+        chunkRepository.deleteByDocumentId(id);
+        documentRepository.deleteById(id);
+    }
+
     public void storeFile(MultipartFile file) throws Exception {
         validateFile(file);
         String text = extractText(file);

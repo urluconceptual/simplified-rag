@@ -64,7 +64,7 @@
                     <th>Filename</th>
                     <th>Type</th>
                     <th>Uploaded</th>
-<!--                    <th></th>-->
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,14 +73,15 @@
                     <td th:text="${doc.fileName}"></td>
                     <td><kbd th:text="${doc.fileType}"></kbd></td>
                     <td th:text="${#temporals.format(doc.uploadedAt, 'dd MMM yyyy HH:mm')}"></td>
-<!--                    <td>-->
-<!--                        <a th:href="@{/chat/{id}(id=${doc.id})}"-->
-<!--                           role="button"-->
-<!--                           class="outline"-->
-<!--                           style="white-space: nowrap;">-->
-<!--                            💬 Ask questions-->
-<!--                        </a>-->
-<!--                    </td>-->
+                    <td>
+                        <form th:action="@{/documents/{id}/delete(id=${doc.id})}" method="post"
+                              onsubmit="return confirm('Delete ' + /*[[${doc.fileName}]]*/ '' + '?');">
+                            <button type="submit" class="outline contrast"
+                                    style="width:auto; margin-bottom:0; padding: 0.25rem 0.75rem;">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 </tbody>
             </table>
