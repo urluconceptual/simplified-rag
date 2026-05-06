@@ -20,20 +20,15 @@ spring:
     init:
       mode: always
 
-
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
 
-  ai:
-    google:
-      genai:
-        api-key: ${GOOGLE_GENAI_API_KEY}
-        chat:
-          options:
-            model: ${GOOGLE_GENAI_MODEL}
-            temperature: 0.2
   jpa:
     hibernate:
       ddl-auto: none
+
+groq:
+  api-key: ${GROQ_API_KEY}
+  model: ${GROQ_MODEL:llama-3.3-70b-versatile}

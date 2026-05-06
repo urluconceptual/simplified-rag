@@ -5,7 +5,6 @@ import com.unibuc.simplifiedrag.model.ChatResponse;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,30 +21,27 @@ public class ChatService {
 
     private final JdbcTemplate jdbc;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
-    private final ChatClient chatClient;
+    private final GroqClient groqClient;
 
     public ChatResponse ask(List<Long> documentIds, String question) {
         List<Chunk> chunks = retrieveRelevantChunks(documentIds, question);
-
         chunks.forEach(c -> log.info("Chunk: {}", c.getChunkText().substring(0, Math.min(100, c.getChunkText().length()))));
-
         String answer = generateAnswer(question, chunks);
-
         return new ChatResponse(answer, chunks);
     }
 
     private List<Chunk> retrieveRelevantChunks(List<Long> documentIds, String question) {
-    String sql = """
-        SELECT *
-        FROM chunks
-        WHERE document_id IN (:ids)
-        ORDER BY VECTOR_DISTANCE(
-            embedding,
-            VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :question AS data),
-            COSINE
-        )
-        FETCH FIRST 5 ROWS ONLY
-    """;
+        String sql = """
+            SELECT *
+            FROM chunks
+            WHERE document_id IN (:ids)
+            ORDER BY VECTOR_DISTANCE(
+                embedding,
+                VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :question AS data),
+                COSINE
+            )
+            FETCH FIRST 5 ROWS ONLY
+        """;
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("ids", documentIds);
@@ -63,9 +59,7 @@ public class ChatService {
                 }
         );
 
-        log.info("Retrieved {} chunks for question: '{}'",
-                chunks.size(), question);
-
+        log.info("Retrieved {} chunks for question: '{}'", chunks.size(), question);
         return chunks;
     }
 
@@ -78,23 +72,19 @@ public class ChatService {
                 .mapToObj(i -> "Chunk %d:\n%s".formatted(i + 1, chunks.get(i).getChunkText()))
                 .collect(Collectors.joining("\n\n---\n\n"));
 
-        String answer = chatClient.prompt()
-                .user(u -> u.text("""
-            Answer the question based strictly on the context below.
-            If the answer is not in the context, say "I don't have enough
-            information in this document to answer that question."
+        String userMessage = """
+                Answer the question based strictly on the context below.
+                If the answer is not in the context, say "I don't have enough
+                information in this document to answer that question."
 
-            Context:
-            {context}
+                Context:
+                %s
 
-            Question:
-            {question}
-        """)
-                        .param("context", context)
-                        .param("question", question))
-                .call()
-                .content();
+                Question:
+                %s
+                """.formatted(context, question);
 
+        String answer = groqClient.complete(userMessage);
         log.info("Generated answer for question: '{}'", question);
         return answer;
     }
