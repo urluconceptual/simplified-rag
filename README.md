@@ -165,6 +165,14 @@ The tables don't have to exist before running, the schema.sql file is being run 
 
 ## Screenshots
 
+![docs_page.png](docs_page.png)
+
+![ask_question_page.png](ask_question_page.png)
+
+![answer_page.png](answer_page.png)
+
+![source_chunks_page.png](source_chunks_page.png)
+
 ---
 
 ## References
