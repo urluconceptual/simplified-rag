@@ -15,6 +15,8 @@ through Spring AI, while the communication with groq consists in API calls.
 3. [Configuration](#configuration)
 4. [Key Code Fragments](#key-code-fragments)
 5. [Running the Application](#running-the-application)
+6. [Screenshots](#screenshots)
+7. [References](#references)
 
 ---
 
@@ -160,3 +162,16 @@ The application will start on `http://localhost:8080`.
 The tables don't have to exist before running, the schema.sql file is being run at each start of the application.
 
 ---
+
+## Screenshots
+
+---
+
+## References
+
+https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/sql-quick-start-using-vector-embedding-model-uploaded-database.html
+https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/import-onnx-models-oracle-ai-database-end-end-example.html
+https://blogs.oracle.com/machinelearning/use-our-prebuilt-onnx-model-now-available-for-embedding-generation-in-oracle-database-23ai
+https://docs.spring.io/spring-boot/docs/4.0.x/reference/html/
+https://console.groq.com/docs/openai
+https://medium.com/@ashokreddy20020427/integrating-google-gemini-with-spring-boot-using-spring-ai-chatclient-a25ec80189de
